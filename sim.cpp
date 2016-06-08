@@ -50,9 +50,8 @@ void simulateRealData(vector<double> &simData, vector<double> pulseProfile, doub
     default_random_engine generator (seed);
     normal_distribution<double> distribution (0.0, 1.0);
 
-    size_t x{0};
     double carrierPeriod = 1 / carrierFreq;
-    for (size_t j{}; j < timeSamples; ++j) {
+    for (size_t i{}; i < timeSamples; ++i) {
         simData[i] = 127 * distribution(generator);
         // simple cosine wave
       	//simData[i] = 127 * cos(2 * M_PI * carrierFreq * step * i);
