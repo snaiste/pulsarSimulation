@@ -9,8 +9,8 @@
 #include <chrono>    // time
 #include <random>    // random numbers
 
-#include <stdlib.h>  /* srand, rand */
-#include <time.h>    /* time */
+//#include <stdlib.h>  /* srand, rand */
+//#include <time.h>    /* time */
 
 using namespace std;
 
@@ -51,17 +51,14 @@ void simulateRealData(vector<double> &simData, vector<double> pulseProfile, doub
     normal_distribution<double> distribution (0.0, 1.0);
 
     size_t x{0};
-    int timeSeg = 32000000;
     double carrierPeriod = 1 / carrierFreq;
-    for (size_t j{}; j < timeSamples/timeSeg; ++j) {
-      	for (size_t i{0}; i < timeSeg; ++i) {
-            simData[i] = 127 * distribution(generator);
-            // simple cosine wave
-      	    //simData[i] = 127 * cos(2 * M_PI * carrierFreq * step * i);
-            simData[i] = floor(simData[i] + 0.5);
-      	}
-    	  clock_t end = clock();
-    	  cout << "Done (" << double(end - begin) / CLOCKS_PER_SEC << "s)" << endl;
+    for (size_t j{}; j < timeSamples; ++j) {
+        simData[i] = 127 * distribution(generator);
+        // simple cosine wave
+      	//simData[i] = 127 * cos(2 * M_PI * carrierFreq * step * i);
+        simData[i] = floor(simData[i] + 0.5);
+    	clock_t end = clock();
+    	cout << "Done (" << double(end - begin) / CLOCKS_PER_SEC << "s)" << endl;
   	}
 }
 
