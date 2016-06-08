@@ -9,9 +9,6 @@
 #include <chrono>    // time
 #include <random>    // random numbers
 
-//#include <stdlib.h>  /* srand, rand */
-//#include <time.h>    /* time */
-
 using namespace std;
 
 //--------------------------------------------------------------------
@@ -42,40 +39,21 @@ void simulateRealData(vector<double> &simData, vector<double> pulseProfile, doub
     clock_t begin = clock();
     cout << "[SIMULATE] Simulating data... " << flush; 
 
-    /* initialize random seed: */
-    srand (time(NULL));
-
     // construct a trivial random generator engine from a time-based seed:
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     default_random_engine generator (seed);
     normal_distribution<double> distribution (0.0, 1.0);
 
+    size_t x{};
     double carrierPeriod = 1 / carrierFreq;
     for (size_t i{}; i < timeSamples; ++i) {
-        simData[i] = 127 * distribution(generator);
-        // simple cosine wave
-      	//simData[i] = 127 * cos(2 * M_PI * carrierFreq * step * i);
-        simData[i] = floor(simData[i] + 0.5);
-    	clock_t end = clock();
-    	cout << "Done (" << double(end - begin) / CLOCKS_PER_SEC << "s)" << endl;
-  	}
-}
-
-//--------------------------------------------------------------------
-// MODULATE SIGNAL
-//--------------------------------------------------------------------
-
-void modulateData(vector<double> &simData, vector<double> pulseProfile, double timeSamples) {
-    clock_t begin = clock();
-    cout << "[MODULATE] Modulating data... " << flush; 
-
-    size_t x{0};
-    for (size_t i{0}; i < timeSamples; ++i) {
         if (x == pulseProfile.size()) {
             x = 0; // pulsar is off
         }  
-        // simulate signal - pulsar modulated normal distribution
-        simData[i] *= pulseProfile[x];  
+        // random white noise
+        //simData[i] = pulseProfile[x] * 127 * distribution(generator);
+        // simple cosine wave
+      	simData[i] = pulseProfile[x] * 127 * cos(2 * M_PI * carrierFreq * step * i);
         simData[i] = floor(simData[i] + 0.5);
         ++x;
     }
@@ -202,24 +180,25 @@ int main() {
     // define parameters
     // all time variables multiplied by 2, because Hilbert transform
     // returns half data
+    /*
     double pulsePeriod = 0.3587384107696 * 2; // seconds
     double dutyCycle = 10; // only needed for square-shape pulsar pulse
     double step = 0.0625; // useconds
     double FWHM = 0.006 * 2; // seconds
     double duration = 1 * 2; // seconds // or 10 * 2 for full dataset
     double carrierFreq = 4; // MHz // only needed for monochromatic wave case
-    
+    */
 
     // TEST Hilbert with cosine and sine
     
-    /*
+    
     double pulsePeriod = 0.02; // seconds
     double dutyCycle = 10; 
     double step = 10; // useconds
     double FWHM = 0.005; // seconds
     double duration = 1; // seconds
     double carrierFreq = 0.002; // MHz
-    */
+    
 
     /*
     double pulsePeriod = 0.02; // seconds
@@ -269,12 +248,6 @@ int main() {
         cout << simDataImagR[i] << endl;
     }
 
-    // Modulate data with pulse profile
-    modulateData(simDataRealR, pulseProfile, timeSamples);
-    modulateData(simDataImagR, pulseProfile, timeSamples);
-    modulateData(simDataRealL, pulseProfile, timeSamples);
-    modulateData(simDataImagL, pulseProfile, timeSamples);
-
     // data vector will contain right polarisation real and imag parts as well as
     // left polarisation real and imag parts, hence length * 4
     size_t dataLength = (simDataRealR.size()) * 4;
@@ -291,21 +264,20 @@ int main() {
     */
     
     // print real and imaginary parts to separate files for testing
-    /*
+    
     cout << "Printing right polarisation real parts..." << endl;
-    ofstream fileRealR("simRealR.txt");
+    ofstream fileRealR("outputs/simRealR.txt");
     for (size_t i{0}; i < simDataRealR.size(); ++i) {
         fileRealR << simDataRealR[i] << endl;
     } 
     fileRealR.close();
 
     cout << "Printing right polarisation imaginary parts..." << endl;
-    ofstream fileImagR("simImagR.txt");
+    ofstream fileImagR("outputs/simImagR.txt");
     for (size_t i{0}; i < simDataImagR.size(); ++i) {
         fileImagR << simDataImagR[i] << endl;
     } 
     fileImagR.close();
-    */
 
     /*
     cout << "Printing complex numbers..." << endl;
@@ -323,7 +295,7 @@ int main() {
     
     // print magnitudes for testing...
     cout << "Printing magnitudes..." << endl;
-    ofstream fileMagsR("simMagsR.txt");
+    ofstream fileMagsR("outputs/simMagsR.txt");
     for (size_t i{0}; i < simDataImagR.size(); ++i)     {
         fileMagsR << sqrt(pow(simDataRealR[i], 2.) + pow(simDataImagR[i], 2.)) << endl;
     } 
@@ -340,7 +312,7 @@ int main() {
     cout << "Data elements in one channel: " << simDataRealR.size() << endl;
 
     // write data to binary file
-    binWrite(simData, "random.dada");
+    binWrite(simData, "outputs/random.dada");
   
     return EXIT_SUCCESS;
 }      
