@@ -1,6 +1,7 @@
 ### Pulsar Simulation
 
 Command line compilation: g++ sim.cpp -o sim -lm -lfftw3 -std=c++0x
+
 Requirements: [fftw3 library](http://www.fftw.org)
 
 This simulation was developed to be used with the software that reads two’s-complement 8-bit (whole numbers in the range [-127; 128]), complex-sampled, dual circular polarisation, single-sub-band data from a specified file of DADA format. A file of DADA format contains 4096 byte ASCII header and complex data samples alternating like so: Real X, Imaginary X, Real Y, Imaginary Y, Real X, Imaginary X, etc. In this project, X and Y corresponded to right and left circular polarisation components respectively.
